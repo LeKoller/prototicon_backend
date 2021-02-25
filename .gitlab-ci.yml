@@ -1,6 +1,6 @@
 test-job:
   stage: test
   script:
-    - sudo docker-compose run -e TEST=TEST web python manage.py test
+    - docker-compose run -e TEST=TEST web python manage.py test
   only:
     - merge_request
