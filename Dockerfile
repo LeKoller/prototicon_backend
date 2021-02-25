@@ -10,3 +10,7 @@ RUN pip install psycopg2
 
 WORKDIR /code
 COPY . /code/
+
+# RUN adduser -D dockuser
+# USER dockuser
+# RUN chown dockuser:dockuser -R /code/

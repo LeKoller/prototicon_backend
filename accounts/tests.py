@@ -21,7 +21,7 @@ class TestUserModel(TestCase):
 
         guilherme = User.objects.first()
 
-        self.assertEqual(False)
+        self.assertTrue(False)
         self.assertEqual(guilherme.username, self.guilherme_data['username'])
         self.assertEqual(len(guilherme.followers.all()), 0)
         self.assertEqual(len(guilherme.following.all()), 0)
