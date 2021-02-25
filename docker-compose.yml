@@ -4,7 +4,7 @@ services:
         image: postgres:11
         env_file: envs/dev.env
         ports: 
-            - 5431:5432
+            - 5432:5432
         volumes: 
             - pgdata:/var/lib/postgresql/data
 
