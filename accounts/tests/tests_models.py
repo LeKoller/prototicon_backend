@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.db import IntegrityError
 
-from .models import User
+from ..models import User
 
 
 class TestUserModel(TestCase):
@@ -21,7 +21,6 @@ class TestUserModel(TestCase):
 
         guilherme = User.objects.first()
 
-        self.assertTrue(False)
         self.assertEqual(guilherme.username, self.guilherme_data['username'])
         self.assertEqual(len(guilherme.followers.all()), 0)
         self.assertEqual(len(guilherme.following.all()), 0)
