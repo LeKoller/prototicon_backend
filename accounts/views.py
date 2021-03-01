@@ -30,6 +30,15 @@ class AccountsView(APIView):
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+    def delete(self, request, user_username: str):
+        try:
+            user = User.objects.get(username=user_username)
+            user.delete()
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class LoginView(APIView):
     def post(self, request):

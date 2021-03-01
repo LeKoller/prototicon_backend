@@ -10,10 +10,10 @@ class TestContentModel(TestCase):
             'text': 'a text',
             'image': 'an image'
         }
-    
-    def test_create_a_content(self):
-        content = Content.objects.create(**self.content_data)
 
-        content = Content.objects.first()
-        
-        self.assertEqual(content.image, self.content_data['image'])
+    def test_create_a_content(self):
+        contents = Content.objects.create(**self.content_data)
+
+        contents = Content.objects.first()
+
+        self.assertEqual(contents.image, self.content_data['image'])

@@ -8,4 +8,6 @@ class Content(models.Model):
     text = models.CharField(max_length=255)
     image = models.CharField(max_length=255)
     likes = models.IntegerField(default=0)
+    is_private = models.BooleanField(default=False)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
