@@ -4,7 +4,6 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-import ipdb
 
 from .serializers import ContentSerializer
 from .models import Content
@@ -34,7 +33,6 @@ class ContentsView(APIView):
             }
 
             content = Content.objects.create(**content_data)
-            # print(content.user)
             serializer = ContentSerializer(content)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
