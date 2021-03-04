@@ -15,8 +15,6 @@ class ContentsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-
-        # print(request.data)
         serializer = ContentSerializer(data=request.data)
 
         if not serializer.is_valid():
@@ -26,18 +24,25 @@ class ContentsView(APIView):
 
         try:
             user = User.objects.get(username=username)
-            content_data = {
-                'title': request.data['title'],
-                'text': request.data['text'],
-                # 'image': request.data['image'],
-                'is_private': request.data['is_private'],
-                'user_id': user.id
-            }
 
-            content = Content.objects.create(**content_data)
-            serializer = ContentSerializer(content)
+            try:
+                content_data = {
+                    'title': request.data['title'],
+                    'text': request.data['text'],
+                    'is_private': request.data['is_private'],
+                    'user_id': user.id
+                }
+            except:
+                content_data = {
+                    'title': request.data['title'],
+                    'is_private': request.data['is_private'],
+                    'user_id': user.id
+                }
+            finally:
+                content = Content.objects.create(**content_data)
+                serializer = ContentSerializer(content)
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -57,6 +62,6 @@ class ContentImageView(APIView):
             content.image = request.data['image']
             content.save()
 
-            return Response(status=status.HTTP_200_OK)
+            return Response({'message': f'{content.image.name} was saved.'}, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
