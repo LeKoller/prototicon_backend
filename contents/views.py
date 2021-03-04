@@ -15,6 +15,8 @@ class ContentsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+
+        print(request.data)
         serializer = ContentSerializer(data=request.data)
 
         if not serializer.is_valid():
