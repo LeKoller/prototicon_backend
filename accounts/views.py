@@ -54,8 +54,6 @@ class LoginView(APIView):
             token = Token.objects.get_or_create(user=user)[0]
             return Response({
                 'token': token.key,
-                'followers': len(user.followers),
-                'following': len(user.following),
             }, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
