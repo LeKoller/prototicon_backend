@@ -5,9 +5,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import ContentSerializer, ContentImageSerializer
+from .serializers import ContentSerializer, ContentImageSerializer, FeedSerializer
 from .models import Content
 from accounts.models import User
+from tot.services import get_user_contents
 
 
 class ContentsView(APIView):
@@ -20,10 +21,8 @@ class ContentsView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        username = request.data['user']
-
         try:
-            user = User.objects.get(username=username)
+            user = request.user
 
             try:
                 content_data = {
@@ -63,5 +62,19 @@ class ContentImageView(APIView):
             content.save()
 
             return Response({'message': f'{content.image.name} was saved.'}, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class FeedViews(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, target_username: str):
+        try:
+            contents = get_user_contents(target_username)
+            serializer = FeedSerializer(contents)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)

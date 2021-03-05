@@ -6,5 +6,6 @@ urlpatterns = [
     path('accounts/', AccountsView.as_view()),
     path('accounts/<str:user_username>/', AccountsView.as_view()),
     path('login/', LoginView.as_view()),
-    path('follow/<str:target_username>/', FollowView.as_view())
+    path('follow/<str:target_username>/', FollowView.as_view()),
+    path('follow/', FollowView.as_view())
 ]

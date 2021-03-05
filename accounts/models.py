@@ -11,10 +11,16 @@ class User(AbstractUser):
     )
 
     def follow_or_unfollow(self, target_username):
+        target_user = User.objects.get(username=target_username)
         following_set = set()
-        for user in self.following.iterable:
-            print(user)
-        target_set = set(target_username)
+        target_set = set()
+        target_set.add(target_user)
+
+        for user in self.following.all():
+            following_set.add(user)
+
+        print(target_set)
+        print(following_set)
 
         if target_set.issubset(following_set):
             self.unfollow(target_username)
@@ -32,7 +38,8 @@ class User(AbstractUser):
         self.save()
 
     def get_friends(self):
-        following_set = set(self.following)
-        followers_set = set(self.followers)
+        following_set = set(self.following.all())
+        followers_set = set(self.followers.all())
+        friends_list = list(followers_set.intersection(followers_set))
 
-        return list(followers_set.intersection(followers_set))
+        return {'friends': friends_list}

@@ -9,7 +9,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 
-from .serializers import UserSerializer, LoginSerializer, EditUserSerializer
+from .serializers import UserSerializer, LoginSerializer, EditUserSerializer, FriendsSerializer
 from .models import User
 
 
@@ -103,6 +103,7 @@ class FollowView(APIView):
 
     def post(self, request, target_username: str):
         user = request.user
+
         try:
             user.follow_or_unfollow(target_username)
             serializer = UserSerializer(user)
@@ -111,13 +112,13 @@ class FollowView(APIView):
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    # def delete(self, request, target_username: str):
-    #     user = request.user
+    def get(self, request):
+        user = request.user
 
-    #     try:
-    #         user.unfollow(target_username)
-    #         serializer = UserSerializer(user)
+        try:
+            friends_dict = user.get_friends()
+            serializer = FriendsSerializer(friends_dict)
 
-    #         return Response(serializer.data, status=status.HTTP_200_OK)
-    #     except:
-    #         return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)

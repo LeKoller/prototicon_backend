@@ -5,6 +5,8 @@ from .models import User
 
 class FollowerSerializer(serializers.Serializer):
     username = serializers.CharField()
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
 
 
 class UserSerializer(serializers.Serializer):
@@ -32,3 +34,7 @@ class EditUserSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True, required=False)
     is_staff = serializers.BooleanField(default=False, required=False)
     is_superuser = serializers.BooleanField(default=False, required=False)
+
+
+class FriendsSerializer(serializers.Serializer):
+    friends = UserSerializer(many=True)
