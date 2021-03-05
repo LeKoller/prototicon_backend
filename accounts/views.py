@@ -88,10 +88,15 @@ class LoginView(APIView):
         user = authenticate(
             username=serializer.data['username'], password=serializer.data['password'])
 
+        user_serializer = UserSerializer(user)
+        friends_serializer = FriendsSerializer(user.get_friends())
+
         if user is not None:
             token = Token.objects.get_or_create(user=user)[0]
             return Response({
                 'token': token.key,
+                'user': user_serializer.data,
+                'friends': friends_serializer.data,
             }, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
