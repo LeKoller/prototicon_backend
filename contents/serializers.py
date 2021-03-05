@@ -14,4 +14,4 @@ class ContentSerializer(serializers.Serializer):
 
 class ContentImageSerializer(serializers.Serializer):
     content_id = serializers.IntegerField()
-    image = serializers.ImageField(allow_null=True)
+    image = serializers.ImageField()

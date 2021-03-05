@@ -4,8 +4,12 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework import status
 from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
-from .serializers import UserSerializer, LoginSerializer
+
+from .serializers import UserSerializer, LoginSerializer, EditUserSerializer
 from .models import User
 
 
@@ -39,6 +43,40 @@ class AccountsView(APIView):
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+    def put(self, request, user_username: str):
+        try:
+            user = User.objects.get(username=user_username)
+            serializer = EditUserSerializer(data=request.data)
+
+            if not serializer.is_valid():
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            altered_fields = request.data.keys()
+
+            for field in altered_fields:
+                if field == 'username':
+                    user.username = request.data[field]
+                elif field == 'first_name':
+                    user.first_name = request.data[field]
+                elif field == 'last_name':
+                    user.last_name = request.data[field]
+                elif field == 'email':
+                    user.email = request.data[field]
+                elif field == 'password':
+                    user.password = request.data[field]
+                elif field == 'is_staff':
+                    user.is_staff = request.data[field]
+                elif field == 'is_superuser':
+                    user.is_superuser = request.data[field]
+
+            user.save()
+
+            serializer = UserSerializer(user)
+
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 class LoginView(APIView):
     def post(self, request):
@@ -57,3 +95,29 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+class FollowView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, target_username: str):
+        user = request.user
+        try:
+            user.follow_or_unfollow(target_username)
+            serializer = UserSerializer(user)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # def delete(self, request, target_username: str):
+    #     user = request.user
+
+    #     try:
+    #         user.unfollow(target_username)
+    #         serializer = UserSerializer(user)
+
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     except:
+    #         return Response(status=status.HTTP_404_NOT_FOUND)
