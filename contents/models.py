@@ -9,5 +9,6 @@ class Content(models.Model):
     image = models.ImageField(upload_to='media/')
     likes = models.IntegerField(default=0)
     is_private = models.BooleanField(default=False)
+    author_username = models.CharField(max_length=63, default="Anonymous")
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)

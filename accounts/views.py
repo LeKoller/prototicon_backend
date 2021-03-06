@@ -9,7 +9,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 
-from .serializers import UserSerializer, LoginSerializer, EditUserSerializer, FriendsSerializer
+from .serializers import UserSerializer, LoginSerializer, EditUserSerializer, FriendsSerializer, UserImageSerializer
 from .models import User
 
 
@@ -74,6 +74,26 @@ class AccountsView(APIView):
             serializer = UserSerializer(user)
 
             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class UserAvatarView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = UserImageSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = request.user
+            user.image = request.data['image']
+            user.save()
+
+            return Response(status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 

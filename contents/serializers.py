@@ -11,6 +11,7 @@ class ContentSerializer(serializers.Serializer):
     likes = serializers.IntegerField(required=False)
     is_private = serializers.BooleanField()
     user_id = serializers.IntegerField(required=False, write_only=True)
+    author_username = serializers.CharField(required=False)
 
 
 class ContentImageSerializer(serializers.Serializer):

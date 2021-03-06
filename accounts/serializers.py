@@ -17,8 +17,13 @@ class UserSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     is_staff = serializers.BooleanField(default=False)
     is_superuser = serializers.BooleanField(default=False)
+    image = serializers.ImageField(read_only=True)
     following = FollowerSerializer(many=True, read_only=True)
     followers = FollowerSerializer(many=True, read_only=True)
+
+
+class UserImageSerializer(serializers.Serializer):
+    image = serializers.ImageField()
 
 
 class LoginSerializer(serializers.Serializer):
