@@ -7,6 +7,7 @@ from contents.models import Content
 class Comment(models.Model):
     text = models.CharField(max_length=255)
     likes = models.IntegerField(default=0)
+    author_username = models.CharField(max_length=63, default='Anonymous')
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.ForeignKey(Content, on_delete=models.CASCADE)

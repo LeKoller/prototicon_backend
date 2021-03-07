@@ -5,9 +5,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import CommentSerializer
-from accounts.models import User
+from .serializers import CommentSerializer, CommentsListSerializer
 from .models import Comment
+from accounts.models import User
+from contents.models import Content
 
 
 class CommentsView(APIView):
@@ -20,20 +21,31 @@ class CommentsView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        username = request.data['author']
-
         try:
-            author = User.objects.get(username=username)
+            author = request.user
 
             comment_data = {
-                text = request.data['text'],
-                author_id = author.id,
-                content_id = request.data['content_id']
+                'text': request.data['text'],
+                'author_id': author.id,
+                'author_username': author.username,
+                'content_id': request.data['content_id']
             }
 
             comment = Comment.objects.create(**comment_data)
             serializer = CommentSerializer(comment)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request, content_id: int):
+        try:
+            content = Content.objects.get(id=content_id)
+            comments = Comment.objects.filter(content=content)
+
+            serializer = CommentsListSerializer({'comments': comments})
+            print(serializer.data)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
