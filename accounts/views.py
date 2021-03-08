@@ -98,6 +98,26 @@ class UserAvatarView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+class UserWallpaperView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = UserImageSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = request.user
+            user.wallpaper = request.data['image']
+            user.save()
+
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)

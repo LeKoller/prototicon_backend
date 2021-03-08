@@ -22,6 +22,7 @@ class UserSerializer(serializers.Serializer):
     is_staff = serializers.BooleanField(default=False)
     is_superuser = serializers.BooleanField(default=False)
     image = serializers.ImageField(read_only=True)
+    wallpaper = serializers.ImageField(read_only=True)
     following = FollowerSerializer(many=True, read_only=True)
     followers = FollowerSerializer(many=True, read_only=True)
     liked_content = ContentIDSerializer(many=True, read_only=True)

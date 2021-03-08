@@ -11,6 +11,8 @@ class User(AbstractUser):
     )
     image = models.ImageField(
         upload_to='avatars/', null=True, blank=True)
+    wallpaper = models.ImageField(
+        upload_to='wallpapers/', null=True, blank=True)
 
     def follow_or_unfollow(self, target_username):
         target_user = User.objects.get(username=target_username)
