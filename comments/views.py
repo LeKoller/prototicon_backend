@@ -44,7 +44,6 @@ class CommentsView(APIView):
             comments = Comment.objects.filter(content=content)
 
             serializer = CommentsListSerializer({'comments': comments})
-            print(serializer.data)
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:

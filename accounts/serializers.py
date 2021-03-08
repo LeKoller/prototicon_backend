@@ -9,6 +9,10 @@ class FollowerSerializer(serializers.Serializer):
     last_name = serializers.CharField()
 
 
+class ContentIDSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+
+
 class UserSerializer(serializers.Serializer):
     username = serializers.CharField()
     first_name = serializers.CharField()
@@ -20,6 +24,7 @@ class UserSerializer(serializers.Serializer):
     image = serializers.ImageField(read_only=True)
     following = FollowerSerializer(many=True, read_only=True)
     followers = FollowerSerializer(many=True, read_only=True)
+    liked_content = ContentIDSerializer(many=True, read_only=True)
 
 
 class UserImageSerializer(serializers.Serializer):

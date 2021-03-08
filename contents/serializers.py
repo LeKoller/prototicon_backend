@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import Content
+from accounts.serializers import UserSerializer
 
 
 class ContentSerializer(serializers.Serializer):
@@ -8,7 +9,7 @@ class ContentSerializer(serializers.Serializer):
     title = serializers.CharField()
     text = serializers.CharField(required=False)
     image = serializers.ImageField(read_only=True)
-    likes = serializers.IntegerField(required=False)
+    likes = UserSerializer(many=True, read_only=True)
     is_private = serializers.BooleanField()
     user_id = serializers.IntegerField(required=False, write_only=True)
     author_username = serializers.CharField(required=False)
@@ -21,3 +22,10 @@ class ContentImageSerializer(serializers.Serializer):
 
 class FeedSerializer(serializers.Serializer):
     contents = ContentSerializer(many=True)
+
+
+class EditContentSerializer(serializers.Serializer):
+    title = serializers.CharField(required=False)
+    text = serializers.CharField(required=False)
+    image = serializers.ImageField(read_only=True, required=False)
+    is_private = serializers.BooleanField(required=False)

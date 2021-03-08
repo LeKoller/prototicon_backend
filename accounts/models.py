@@ -21,9 +21,6 @@ class User(AbstractUser):
         for user in self.following.all():
             following_set.add(user)
 
-        print(target_set)
-        print(following_set)
-
         if target_set.issubset(following_set):
             self.unfollow(target_username)
         else:
