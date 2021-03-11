@@ -89,6 +89,20 @@ class ContentsView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+class SingleContentGetView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, content_id: int):
+        try:
+            content = Content.objects.get(id=content_id)
+            serializer = ContentSerializer(content)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
 class ContentImageView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

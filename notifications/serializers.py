@@ -8,6 +8,7 @@ class NotificationSerializer(serializers.Serializer):
     is_seen = serializers.BooleanField(required=False)
     user_username = serializers.CharField()
     user_id = serializers.IntegerField(write_only=True, required=False)
+    content_id = serializers.IntegerField(required=False)
 
 
 class NotificationsListSerializer(serializers.Serializer):

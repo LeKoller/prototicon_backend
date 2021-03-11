@@ -17,6 +17,8 @@ class NotificationsView(APIView):
     def post(self, request):
         serializer = NotificationSerializer(data=request.data)
 
+        print(request.data)
+
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -33,6 +35,10 @@ class NotificationsView(APIView):
                 'user_username': request.data['user_username'],
                 'user_id': user.id,
             }
+
+            if nt == 'liked' or nt == 'commented':
+                notification_data.update(
+                    {'content_id': request.data['content_id']})
 
             notification = Notification.objects.create(**notification_data)
             serializer = NotificationSerializer(notification)
@@ -58,5 +64,17 @@ class NotificationsView(APIView):
             notification.see()
 
             return Response(status=status.HTTP_202_ACCEPTED)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request):
+        try:
+            user = request.user
+            notifications = Notification.objects.filter(user=user)
+
+            for notification in notifications:
+                notification.delete()
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
