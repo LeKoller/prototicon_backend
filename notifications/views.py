@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import NotificationSerializer
+from .serializers import NotificationSerializer, NotificationsListSerializer
 from .models import Notification
 from accounts.models import User
 
@@ -41,10 +41,12 @@ class NotificationsView(APIView):
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def get(self, request, notification_id: int):
+    def get(self, request):
         try:
-            notification = Notification.objects.get(id=notification_id)
-            serializer = NotificationSerializer(notification)
+            user = request.user
+            notifications = Notification.objects.filter(user=user)
+            serializer = NotificationsListSerializer(
+                {'notifications': notifications})
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
