@@ -1,12 +1,14 @@
 from rest_framework import serializers
 
 from .models import User
+from notifications.serializers import NotificationSerializer
 
 
 class FollowerSerializer(serializers.Serializer):
     username = serializers.CharField()
     first_name = serializers.CharField()
     last_name = serializers.CharField()
+    image = serializers.ImageField(read_only=True)
 
 
 class ContentIDSerializer(serializers.Serializer):

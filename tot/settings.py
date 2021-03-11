@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'accounts',
     'contents',
-    'comments'
+    'comments',
+    'notifications',
 ]
 
 MIDDLEWARE = [

@@ -48,3 +48,17 @@ class CommentsView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def delete(self, request, comment_id: int):
+        try:
+            comment = Comment.objects.get(id=comment_id)
+            user = request.user
+
+            if comment.author_username == user.username:
+                comment.delete()
+            else:
+                return Response({'message': "it's not your comment to delete"}, status=status.HTTP_403_FORBIDDEN)
+
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
