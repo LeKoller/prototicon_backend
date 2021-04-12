@@ -4,13 +4,15 @@ from .models import Content
 from accounts.serializers import UserSerializer
 
 
-class ContentSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    title = serializers.CharField()
+class ContentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Content
+        fields = '__all__'
+
+    user = UserSerializer(required=False, write_only=True)
     text = serializers.CharField(required=False)
     image = serializers.ImageField(read_only=True)
     likes = UserSerializer(many=True, read_only=True)
-    is_private = serializers.BooleanField()
     user_id = serializers.IntegerField(required=False, write_only=True)
     author_username = serializers.CharField(required=False)
 

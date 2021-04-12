@@ -15,11 +15,15 @@ class ContentIDSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
 
 
-class UserSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
-    email = serializers.EmailField()
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+    def create(self, validated_data):
+        instance = User.objects.create_user(**validated_data)
+        return instance
+
     password = serializers.CharField(write_only=True)
     is_staff = serializers.BooleanField(default=False)
     is_superuser = serializers.BooleanField(default=False)

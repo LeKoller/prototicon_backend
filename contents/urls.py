@@ -1,12 +1,14 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
-from .views import ContentsView, ContentImageView, FeedViews, LikesView, SingleContentGetView
+from .views import (ContentImageView, LikesView, ContentViewSet)
+
+router = DefaultRouter()
+
+router.register(r'contentsVS', ContentViewSet, basename='Content')
 
 urlpatterns = [
-    path('contents/', ContentsView.as_view()),
-    path('contents/<int:content_id>/', ContentsView.as_view()),
     path('contents/image/', ContentImageView.as_view()),
-    path('contents/<str:target_username>/', FeedViews.as_view()),
     path('contents/like/<int:content_id>/', LikesView.as_view()),
-    path('contents/get_one/<int:content_id>/', SingleContentGetView.as_view()),
+    path('', include(router.urls)),
 ]

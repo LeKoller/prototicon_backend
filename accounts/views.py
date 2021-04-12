@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
+# from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework import status
@@ -9,73 +11,21 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 
-from .serializers import UserSerializer, LoginSerializer, EditUserSerializer, FriendsSerializer, UserImageSerializer
+from .serializers import (UserSerializer, LoginSerializer,
+                          EditUserSerializer, FriendsSerializer, UserImageSerializer)
 from .models import User
 
 
-class AccountsView(APIView):
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
+class AccountsView(RetrieveUpdateDestroyAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    authentication_classes = [TokenAuthentication]
+    lookup_field = 'username'
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.create_user(**request.data)
-        serializer = UserSerializer(user)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def get(self, request, user_username: str):
-        try:
-            user = User.objects.get(username=user_username)
-            serializer = UserSerializer(user)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-    def delete(self, request, user_username: str):
-        try:
-            user = User.objects.get(username=user_username)
-            user.delete()
-
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-    def put(self, request, user_username: str):
-        try:
-            user = User.objects.get(username=user_username)
-            serializer = EditUserSerializer(data=request.data)
-
-            if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-            altered_fields = request.data.keys()
-
-            for field in altered_fields:
-                if field == 'username':
-                    user.username = request.data[field]
-                elif field == 'first_name':
-                    user.first_name = request.data[field]
-                elif field == 'last_name':
-                    user.last_name = request.data[field]
-                elif field == 'email':
-                    user.email = request.data[field]
-                elif field == 'password':
-                    user.password = request.data[field]
-                elif field == 'is_staff':
-                    user.is_staff = request.data[field]
-                elif field == 'is_superuser':
-                    user.is_superuser = request.data[field]
-
-            user.save()
-
-            serializer = UserSerializer(user)
-
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+class CreateAccountView(CreateAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
 
 
 class UserAvatarView(APIView):
@@ -126,8 +76,7 @@ class LoginView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         user = authenticate(
-            username=serializer.data['username'], password=serializer.data['password'])
-
+            username=request.data['username'], password=request.data['password'])
         user_serializer = UserSerializer(user)
         friends_serializer = FriendsSerializer(user.get_friends())
 

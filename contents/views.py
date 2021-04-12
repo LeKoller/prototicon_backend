@@ -1,29 +1,45 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 
 from .serializers import ContentSerializer, ContentImageSerializer, FeedSerializer, EditContentSerializer
 from .models import Content
 from accounts.models import User
 from tot.services import get_user_contents
+from .pagination import CustomPageNumberPagination
 
 
-class ContentsView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+class ContentViewSet(ModelViewSet):
+    @method_decorator(cache_page(99999999999))
+    @method_decorator(vary_on_headers('Authorization'))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
-    def post(self, request):
-        serializer = ContentSerializer(data=request.data)
+    def get_queryset(self):
+        queryset = self.queryset.prefetch_related('likes')
+        queryset = queryset.prefetch_related('likes__following')
+        queryset = queryset.prefetch_related('likes__followers')
+        queryset = queryset.prefetch_related('likes__liked_content')
+        author = self.request.GET.get('author')
 
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if author:
+            queryset = queryset.filter(author_username=author)
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
         try:
             user = request.user
-
             try:
                 content_data = {
                     'title': request.data['title'],
@@ -47,60 +63,11 @@ class ContentsView(APIView):
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-    def put(self, request, content_id: int):
-        try:
-            content = Content.objects.get(id=content_id)
-            serializer = EditContentSerializer(data=request.data)
-
-            if not serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-            altered_fields = request.data.keys()
-
-            for field in altered_fields:
-                if field == 'title':
-                    content.title = request.data[field]
-                elif field == 'text':
-                    content.text = request.data[field]
-                elif field == 'image':
-                    content.image = request.data[field]
-                elif field == 'is_private':
-                    content.is_private = request.data[field]
-
-            content.save()
-
-            serializer = EditContentSerializer(content)
-
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-    def delete(self, request, content_id: int):
-        try:
-            content = Content.objects.get(id=content_id)
-
-            if request.user == content.user:
-                content.delete()
-            else:
-                return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-class SingleContentGetView(APIView):
+    pagination_class = CustomPageNumberPagination
+    serializer_class = ContentSerializer
+    queryset = Content.objects.all()
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-
-    def get(self, request, content_id: int):
-        try:
-            content = Content.objects.get(id=content_id)
-            serializer = ContentSerializer(content)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class ContentImageView(APIView):
@@ -119,17 +86,6 @@ class ContentImageView(APIView):
             content.save()
 
             return Response({'message': f'{content.image.name} was saved.'}, status=status.HTTP_200_OK)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-class FeedViews(APIView):
-    def get(self, request, target_username: str):
-        try:
-            contents = get_user_contents(target_username)
-            serializer = FeedSerializer(contents)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
