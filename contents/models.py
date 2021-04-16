@@ -4,6 +4,11 @@ from accounts.models import User
 
 
 class Content(models.Model):
+    class Meta:
+        indexes = [
+            models.Index(fields=['author_username'])
+        ]
+
     title = models.CharField(max_length=63)
     text = models.CharField(max_length=511, blank=True)
     image = models.ImageField(upload_to='media/')

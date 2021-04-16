@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'contents',
     'comments',
     'notifications',
+    'message',
 ]
 
 REST_FRAMEWORK = {

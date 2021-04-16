@@ -13,6 +13,8 @@ services:
     command: redis-server
     ports:
       - 6379:6379
+    volumes:
+      - reddata:/var/lib/redis/data
 
   web:
     build: .
@@ -31,4 +33,6 @@ services:
 
 volumes:
   pgdata:
+    external: true
+  reddata:
     external: true
