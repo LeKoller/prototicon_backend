@@ -8,13 +8,23 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+  migration:
+    build: .
+    environment:
+      - POSTGRES_DB=tot
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; python3 manage.py migrate'
+    volumes:
+      - .:/code
+    depends_on:
+      - db
+
   redis:
     image: redis
     command: redis-server
     ports:
       - 6379:6379
-    volumes:
-      - reddata:/var/lib/redis/data
 
   web:
     build: .
@@ -33,6 +43,4 @@ services:
 
 volumes:
   pgdata:
-    external: true
-  reddata:
     external: true

@@ -5,7 +5,7 @@ from .views import (ContentImageView, LikesView, ContentViewSet)
 
 router = DefaultRouter()
 
-router.register(r'contentsVS', ContentViewSet, basename='Content')
+router.register(r'contents', ContentViewSet, basename='Content')
 
 urlpatterns = [
     path('contents/image/', ContentImageView.as_view()),

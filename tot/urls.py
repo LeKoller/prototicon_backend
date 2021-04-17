@@ -23,7 +23,8 @@ urlpatterns = [
     path('api/', include('accounts.urls')),
     path('api/', include('contents.urls')),
     path('api/', include('comments.urls')),
-    path('api/', include('notifications.urls'))
+    path('api/', include('notifications.urls')),
+    path('api/', include('message.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns += [re_path(r'^silk/', include('silk.urls', namespace='silk'))]

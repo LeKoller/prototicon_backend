@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'silk',
+    'channels',
     'accounts',
     'contents',
     'comments',
@@ -56,12 +57,23 @@ REST_FRAMEWORK = {
     ]
 }
 
-CACHE = {
+CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://redis:6379",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        }
+    }
+}
+
+ASGI_APPLICATION = 'tot.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('redis', 6379)]
         }
     }
 }

@@ -23,11 +23,6 @@ class ContentCache():
         return self.contents_list
 
     def clear(self):
-        self.product_list = []
+        self.contents_list = []
         empty_array = json.dumps([])
         cache.set(self.key, empty_array, timeout=None)
-
-    def add_content(self, content):
-        contents_list = self.contents_list.append(content)
-        json_contents_list = json.dumps(contents_list)
-        cache.set(self.key, json_contents_list, timeout=None)
