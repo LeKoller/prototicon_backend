@@ -39,7 +39,6 @@ class MessageViewSet(ModelViewSet):
         page = self.paginate_queryset(queryset)
 
         if page is not None:
-            print('oie')
             serializer = self.get_serializer(page, many=True)
             paginated_response = self.get_paginated_response(serializer.data)
             message_cache.set_messages_list(paginated_response.data)
@@ -71,6 +70,20 @@ class MessageViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        author = instance.author_username
+        target = instance.target_username
+
+        if self.request.user.username != author:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        message_cache = MessageCache(author, target)
+        message_cache.clear()
+        instance.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     pagination_class = CustomPageNumberPagination
     serializer_class = MessageSerializer

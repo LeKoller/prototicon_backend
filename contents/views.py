@@ -14,7 +14,6 @@ from accounts.models import User
 from tot.services import get_user_contents
 from .pagination import CustomPageNumberPagination
 from cache.content import ContentCache
-import json
 
 
 class ContentViewSet(ModelViewSet):
@@ -22,7 +21,7 @@ class ContentViewSet(ModelViewSet):
         user = self.request.GET.get('author')
 
         if user is None:
-            user = request.user
+            user = self.request.user
 
         content_cache = ContentCache(user)
         contents_list = content_cache.get_contents_list()
@@ -87,6 +86,19 @@ class ContentViewSet(ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        author = instance.author_username
+
+        if self.request.user.username != author:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        content_cache = ContentCache(author)
+        content_cache.clear()
+        instance.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     pagination_class = CustomPageNumberPagination
     serializer_class = ContentSerializer

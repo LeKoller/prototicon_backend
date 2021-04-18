@@ -6,12 +6,10 @@ from .models import Message
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ["author_username",
-                  "target_username",
-                  "text",
-                  "read",
-                  "in_reply_of_id"]
+        exclude = ['author', 'target']
 
+    id = serializers.IntegerField(read_only=True)
     read = serializers.BooleanField(read_only=True)
-    in_reply_of_id = serializers.IntegerField(required=False)
     author_username = serializers.CharField(required=False)
+    in_reply_of = serializers.PrimaryKeyRelatedField(
+        required=False, read_only=True)
