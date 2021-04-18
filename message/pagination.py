@@ -1,5 +1,4 @@
 from rest_framework import pagination
-from collections import OrderedDict
 
 
 class CustomPageNumberPagination(pagination.PageNumberPagination):

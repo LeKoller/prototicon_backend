@@ -9,6 +9,7 @@ from .models import Message
 from accounts.models import User
 from cache.message import MessageCache
 from message_notification.message_notification_service import notify_message
+from .pagination import CustomPageNumberPagination
 
 
 class MessageViewSet(ModelViewSet):
@@ -38,6 +39,7 @@ class MessageViewSet(ModelViewSet):
         page = self.paginate_queryset(queryset)
 
         if page is not None:
+            print('oie')
             serializer = self.get_serializer(page, many=True)
             paginated_response = self.get_paginated_response(serializer.data)
             message_cache.set_messages_list(paginated_response.data)
@@ -70,6 +72,7 @@ class MessageViewSet(ModelViewSet):
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    pagination_class = CustomPageNumberPagination
     serializer_class = MessageSerializer
     queryset = Message.objects.all()
     authentication_classes = [TokenAuthentication]
