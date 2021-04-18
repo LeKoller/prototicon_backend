@@ -3,15 +3,21 @@ import json
 
 
 class MessageCache():
-    def __init__(self, author, target):
-        self.key = f'author,target:{author},{target}:messages'
+    def __init__(self, user_a, user_b):
+        self.key = f'talk:{user_a},{user_b}:messages'
         messages_list = cache.get(self.key)
 
         if messages_list == 'null' or messages_list == None:
-            empty_array = json.dumps([])
-            cache.set(self.key, empty_array, timeout=None)
+            self.key = f'talk:{user_b},{user_a}:messages'
+            messages_list = cache.get(self.key)
 
-            self.messages_list = []
+            if messages_list == 'null' or messages_list == None:
+                empty_array = json.dumps([])
+                cache.set(self.key, empty_array, timeout=None)
+
+                self.messages_list = []
+            else:
+                self.messages_list = json.loads(messages_list)
         else:
             self.messages_list = json.loads(messages_list)
 

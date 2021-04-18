@@ -12,14 +12,42 @@ from message_notification.message_notification_service import notify_message
 
 
 class MessageViewSet(ModelViewSet):
-    def queryset(self):
-        author = self.request.GET.get('author')
-        target = self.request.user.username
+    def get_queryset(self):
+        interlocutor = self.request.GET.get('username')
+        main_username = self.request.user.username
 
-        queryset = self.queryset.filter(
-            author_username=author, target_username=target)
+        a_queryset = self.queryset.filter(
+            author_username=interlocutor, target_username=main_username)
+        b_queryset = self.queryset.filter(
+            author_username=main_username, target_username=interlocutor)
+        queryset = a_queryset.union(b_queryset)
 
         return queryset.order_by('-id')
+
+    def list(self, request, *args, **kwargs):
+        interlocutor = request.GET.get('username')
+        main_username = request.user.username
+
+        message_cache = MessageCache(interlocutor, main_username)
+        messages_list = message_cache.get_messages_list()
+
+        if messages_list:
+            return Response(messages_list)
+
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            paginated_response = self.get_paginated_response(serializer.data)
+            message_cache.set_messages_list(paginated_response.data)
+
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        message_cache.set_messages_list(serializer.data)
+
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
