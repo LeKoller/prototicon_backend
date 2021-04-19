@@ -64,7 +64,8 @@ class MessageViewSet(ModelViewSet):
             message = Message.objects.create(
                 **request.data, target=target, author=author, author_username=author_username)
             serializer = MessageSerializer(message)
-            # notify_message(serializer.data)
+            notify_message(serializer.data)
+            print('passed from notify_message call.')
             message_cache.clear()
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)

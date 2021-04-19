@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from .models import User
 from notifications.serializers import NotificationSerializer
+# from message.serializers import MessageSerializer
 
 
 class FollowerSerializer(serializers.Serializer):
@@ -32,6 +33,8 @@ class UserSerializer(serializers.ModelSerializer):
     following = FollowerSerializer(many=True, read_only=True)
     followers = FollowerSerializer(many=True, read_only=True)
     liked_content = ContentIDSerializer(many=True, read_only=True)
+    # message_author = MessageSerializer(many=True, read_only=True)
+    # message_target = MessageSerializer(many=True, read_only=True)
 
 
 class UserImageSerializer(serializers.Serializer):

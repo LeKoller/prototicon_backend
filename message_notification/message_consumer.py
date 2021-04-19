@@ -21,12 +21,10 @@ class MessageConsumer(JsonWebsocketConsumer):
     def disconnect(self, close_node):
         pass
 
-    def reload_messages(self, event, author, target):
+    def reload_messages(self, event):
         # a.k.a: reload.messages
-        # message_cache = MessageCache(author, target)
-        # messages_list = message_cache.get_messages_list()
-
+        print('got into reload_messages.')
         self.send_json({
-            'new_message': event['message'],
-            # 'messages': messages_list
+            'message': event['message'],
         })
+        print('passed through the whole thing, end of story.')

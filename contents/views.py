@@ -100,6 +100,20 @@ class ContentViewSet(ModelViewSet):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        author = instance.author_username
+        content_cache = ContentCache(author)
+        content_cache.clear()
+
+        return Response(serializer.data)
+
     pagination_class = CustomPageNumberPagination
     serializer_class = ContentSerializer
     queryset = Content.objects.all()
