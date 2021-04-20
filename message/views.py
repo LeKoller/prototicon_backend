@@ -14,22 +14,22 @@ from .pagination import CustomPageNumberPagination
 
 class MessageViewSet(ModelViewSet):
     def get_queryset(self):
-        interlocutor = self.request.GET.get('username')
-        main_username = self.request.user.username
+        friend = self.request.GET.get('username')
+        user = self.request.user.username
 
         a_queryset = self.queryset.filter(
-            author_username=interlocutor, target_username=main_username)
+            author_username=friend, target_username=user)
         b_queryset = self.queryset.filter(
-            author_username=main_username, target_username=interlocutor)
+            author_username=user, target_username=friend)
         queryset = a_queryset.union(b_queryset)
 
         return queryset.order_by('-id')
 
     def list(self, request, *args, **kwargs):
-        interlocutor = request.GET.get('username')
-        main_username = request.user.username
+        friend = request.GET.get('username')
+        user = request.user.username
 
-        message_cache = MessageCache(interlocutor, main_username)
+        message_cache = MessageCache(friend, user)
         messages_list = message_cache.get_messages_list()
 
         if messages_list:
