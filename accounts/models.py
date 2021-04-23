@@ -4,11 +4,6 @@ from django.conf import settings
 
 
 class User(AbstractUser):
-    class Meta:
-        indexes = [
-            models.Index(fields=['username'])
-        ]
-
     following = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         related_name='followers',
